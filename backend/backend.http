@@ -1,0 +1,113 @@
+### GET request to example server
+GET http://localhost:8888/foodItem?items_per_page=25
+
+### GET request to example server
+GET http://localhost:8888/foodItem/2
+
+###
+POST http://localhost:8888/foodItem
+Content-Type: application/json
+
+{
+  "name": "Water",
+  "weight": 240.0,
+  "calories": 0.0
+}
+
+###
+POST http://localhost:8888/foodItems
+Content-Type: application/json
+
+[
+  {
+    "date": "2025-11-12",
+    "time": "12:33",
+    "name": "Coconut Milk",
+    "weight": 305.0,
+    "calories": 63.54
+  },
+  {
+    "date": "2025-11-12",
+    "time": "12:33",
+    "name": "Special K Protein",
+    "weight": 107.0,
+    "calories": 395.36
+  },
+  {
+    "date": "2025-11-12",
+    "time": "13:01",
+    "name": "Cashews",
+    "weight": 7.5,
+    "calories": 45.0
+  },
+  {
+    "date": "2025-11-12",
+    "time": "13:01",
+    "name": "Diet Red Bull",
+    "weight": 250.0,
+    "calories": 10.0
+  },
+  {
+    "date": "2025-11-12",
+    "time": "13:01",
+    "name": "Combos",
+    "weight": 26.0,
+    "calories": 120.71
+  },
+  {
+    "date": "2025-11-12",
+    "time": "16:16",
+    "name": "Water",
+    "weight": 240.0,
+    "calories": 0
+  },
+  {
+    "date": "2025-11-12",
+    "time": "16:16",
+    "name": "Protein Bar",
+    "weight": 50.0,
+    "calories": 200.0
+  },
+  {
+    "date": "2025-11-12",
+    "time": "18:11",
+    "name": "Pasta Salad",
+    "weight": 172.0,
+    "calories": 371.79
+  },
+  {
+    "date": "2025-11-12",
+    "time": "18:11",
+    "name": "Steelhead",
+    "weight": 173.0,
+    "calories": 276.8
+  },
+  {
+    "date": "2025-11-12",
+    "time": "18:11",
+    "name": "Pinot Noir, 14.5%",
+    "weight": 158.0,
+    "calories": 127.98
+  },
+  {
+    "date": "2025-11-12",
+    "time": "18:11",
+    "name": "Water",
+    "weight": 240.0,
+    "calories": 0.0
+  },
+  {
+    "date": "2025-11-12",
+    "time": "19:39",
+    "name": "Haribo Sour Bats",
+    "weight": 30.0,
+    "calories": 40.0
+  },
+  {
+    "date": "2025-11-12",
+    "time": "21:56",
+    "name": "Pineapple",
+    "weight": 167.0,
+    "calories": 83.5
+  }
+]

@@ -1,0 +1,13 @@
+[package]
+name = "backend"
+version = "0.1.0"
+authors = ["Adam Robison <akrobinson74@gmail.com>"]
+edition = "2024"
+rust-version = "1.91.0"
+publish = false
+
+[workspace]
+members = [".", "api", "entity"]
+
+[dependencies]
+api = {path = "api"}
