@@ -12,9 +12,9 @@ dotenvy = "0.15.7"
 listenfd = "1.0.2"
 entity = { path = "../entity" }
 chrono = "0.4.42"
-time = "0.3.44"
 serde = { version = "1.0.228", features = ["derive"] }
 env_logger = "0.11.8"
+actix-cors = "0.7.1"
 
 [dependencies.sea-orm]
 version = "~2.0.0-rc.18" # sea-orm version

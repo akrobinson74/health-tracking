@@ -1,8 +1,7 @@
 use crate::FoodItemInput;
-use ::entity::{food_item, food_item::ActiveModel, food_item::Entity as FoodItem};
+use ::entity::{food_item, food_item::Entity as FoodItem};
 use chrono::{Local, NaiveDate, NaiveTime};
 use sea_orm::*;
-// use sea_orm::sea_query::Keyword::Default;
 
 pub struct Repo;
 
@@ -10,7 +9,7 @@ impl Repo {
     pub async fn add_food_item(
         db: &DatabaseConnection,
         model: FoodItemInput,
-    ) -> Result<InsertResult<ActiveModel>, DbErr> {
+    ) -> Result<InsertResult<food_item::ActiveModel>, DbErr> {
         let item = Self::active_model(&model);
         let result = FoodItem::insert(item).exec(db).await?;
         Ok(result)
@@ -19,7 +18,7 @@ impl Repo {
     pub async fn add_food_items(
         db: &DatabaseConnection,
         data: Vec<FoodItemInput>,
-    ) -> Result<InsertManyResult<ActiveModel>, DbErr> {
+    ) -> Result<InsertManyResult<food_item::ActiveModel>, DbErr> {
         let food_items = data.iter().map(Self::active_model).collect::<Vec<_>>();
         FoodItem::insert_many(food_items).exec(db).await
     }
@@ -27,8 +26,8 @@ impl Repo {
     pub async fn add_food_item_now(
         db: &DatabaseConnection,
         model: FoodItemInput,
-    ) -> Result<InsertResult<ActiveModel>, DbErr> {
-        let item = ActiveModel {
+    ) -> Result<InsertResult<food_item::ActiveModel>, DbErr> {
+        let item = food_item::ActiveModel {
             date: Set(Local::now().date_naive()),
             time: Set(Local::now().time()),
             name: Set(model.name.to_owned()),
@@ -50,6 +49,13 @@ impl Repo {
         FoodItem::find_by_id(id).one(db).await
     }
 
+    pub async fn get_food_items(db: &DatabaseConnection) -> Result<Vec<food_item::Model>, DbErr> {
+        FoodItem::find()
+            .order_by_asc(food_item::Column::Id)
+            .all(db)
+            .await
+    }
+
     pub async fn get_food_items_in_page(
         db: &DatabaseConnection,
         date: Option<String>,
@@ -61,8 +67,13 @@ impl Repo {
                 .order_by_asc(food_item::Column::Id)
                 .paginate(db, items_per_page)
         } else {
+            let date_parse_result = NaiveDate::parse_from_str(&date.clone().unwrap(), "%Y-%m-%d");
+            let Ok(_) = date_parse_result else {
+                panic!("date parse error");
+            };
+
             FoodItem::find()
-                .filter(food_item::Column::Date.eq(date))
+                .filter(food_item::Column::Date.eq(date_parse_result.unwrap()))
                 .order_by_asc(food_item::Column::Id)
                 .paginate(db, items_per_page)
         };
@@ -72,19 +83,17 @@ impl Repo {
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
 
-    fn active_model(item: &FoodItemInput) -> ActiveModel {
-        let date_parse_result =
-            NaiveDate::parse_from_str(&item.date.clone().unwrap(), "%Y-%m-%d");
+    fn active_model(item: &FoodItemInput) -> food_item::ActiveModel {
+        let date_parse_result = NaiveDate::parse_from_str(&item.date.clone().unwrap(), "%Y-%m-%d");
         let Ok(_) = date_parse_result else {
             panic!("date parse error");
         };
-        let time_parse_result =
-            NaiveTime::parse_from_str(&item.time.clone().unwrap(), "%H:%M");
+        let time_parse_result = NaiveTime::parse_from_str(&item.time.clone().unwrap(), "%H:%M");
         let Ok(_) = time_parse_result else {
             panic!("time parse error");
         };
 
-        ActiveModel {
+        food_item::ActiveModel {
             date: Set(date_parse_result.unwrap()),
             time: Set(time_parse_result.unwrap()),
             name: Set(item.name.to_owned()),

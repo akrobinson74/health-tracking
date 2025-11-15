@@ -9,8 +9,9 @@ use sea_orm::{Database, DatabaseConnection, InsertResult};
 use serde::Deserialize;
 use service::Repo;
 use std::env;
+use actix_cors::Cors;
 
-const DEFAULT_ITEMS_PER_PAGE: u64 = 7;
+const DEFAULT_ITEMS_PER_PAGE: u64 = 25;
 
 #[derive(Debug, Clone)]
 struct AppState {
@@ -76,18 +77,6 @@ async fn create_food_items(
     
     Ok(HttpResponse::Accepted().finish())
 }
-// #[post("/weighIn")]
-// async fn create_weigh_in(
-//     data: web::Data<AppState>,
-//     post_form: web::Form<weigh_in::Model>,
-// ) -> Result<HttpResponse, Error> {
-//     let conn = &data.connection;
-//     let form = post_form.into_inner();
-//
-//     Ok(HttpResponse::Accepted()
-//         .append_header(("location", "/weighIn"))
-//         .finish())
-// }
 
 #[get("/foodItem")]
 async fn list_food_items(
@@ -127,11 +116,22 @@ async fn get_food_item(
     }
 }
 
+#[get("/foodItems")]
+async fn get_food_items(data: web::Data<AppState>) -> Result<HttpResponse, Error> {
+    let conn = &data.connection;
+
+    let items = Repo::get_food_items(conn)
+        .await
+        .expect("Cannot find food_items");
+
+    Ok(HttpResponse::Ok().json(items))
+}
+
 fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(create_food_item);
     cfg.service(create_food_items);
     cfg.service(get_food_item);
-    // cfg.service(get_food_items_for_date);
+    cfg.service(get_food_items);
     cfg.service(list_food_items);
 }
 
@@ -143,7 +143,6 @@ async fn not_found(request: HttpRequest) -> Result<HttpResponse, Error> {
 pub async fn start() -> std::io::Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("debug"));
 
-    // get env vars
     dotenvy::dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
     let host = env::var("HOST").expect("HOST is not set in .env file");
@@ -157,6 +156,15 @@ pub async fn start() -> std::io::Result<()> {
     let mut server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(state.clone()))
+            .wrap(Cors::default()
+                .allowed_origin("http://localhost:3000") // Replace with your actual frontend origin
+                .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+                .allowed_headers(vec![
+                    actix_web::http::header::AUTHORIZATION,
+                    actix_web::http::header::ACCEPT,
+                    actix_web::http::header::CONTENT_TYPE,
+                ])
+                .max_age(3600))
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i")) // enable logger
             .default_service(web::route().to(not_found))
