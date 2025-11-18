@@ -1,6 +1,6 @@
-use crate::FoodItemInput;
+use crate::data::food_item_input::FoodItemInput;
 use ::entity::{food_item, food_item::Entity as FoodItem};
-use chrono::{Local, NaiveDate, NaiveTime};
+use chrono::{Local, NaiveDate};
 use sea_orm::*;
 
 pub struct Repo;
@@ -9,10 +9,10 @@ impl Repo {
     pub async fn add_food_item(
         db: &DatabaseConnection,
         model: FoodItemInput,
-    ) -> Result<InsertResult<food_item::ActiveModel>, DbErr> {
+    ) -> Result<food_item::ActiveModel, DbErr> {
         let item = Self::active_model(&model);
-        let result = FoodItem::insert(item).exec(db).await?;
-        Ok(result)
+        let model = item.save(db).await?;
+        Ok(model)
     }
 
     pub async fn add_food_items(
@@ -26,7 +26,7 @@ impl Repo {
     pub async fn add_food_item_now(
         db: &DatabaseConnection,
         model: FoodItemInput,
-    ) -> Result<InsertResult<food_item::ActiveModel>, DbErr> {
+    ) -> Result<food_item::ActiveModel, DbErr> {
         let item = food_item::ActiveModel {
             date: Set(Local::now().date_naive()),
             time: Set(Local::now().time()),
@@ -38,8 +38,8 @@ impl Repo {
             ..Default::default()
         };
 
-        let result = FoodItem::insert(item).exec(db).await?;
-        Ok(result)
+        let model = item.save(db).await?;
+        Ok(model)
     }
 
     pub async fn get_food_item_by_id(
@@ -84,18 +84,12 @@ impl Repo {
     }
 
     fn active_model(item: &FoodItemInput) -> food_item::ActiveModel {
-        let date_parse_result = NaiveDate::parse_from_str(&item.date.clone().unwrap(), "%Y-%m-%d");
-        let Ok(_) = date_parse_result else {
-            panic!("date parse error");
-        };
-        let time_parse_result = NaiveTime::parse_from_str(&item.time.clone().unwrap(), "%H:%M");
-        let Ok(_) = time_parse_result else {
-            panic!("time parse error");
-        };
+        let date_parse_result = item.date_as_native_date();
+        let time_parse_result = item.time_as_native_time();
 
         food_item::ActiveModel {
-            date: Set(date_parse_result.unwrap()),
-            time: Set(time_parse_result.unwrap()),
+            date: Set(date_parse_result),
+            time: Set(time_parse_result),
             name: Set(item.name.to_owned()),
             weight: Set(item.weight.to_owned()),
             calories: Set(item.calories.to_owned()),

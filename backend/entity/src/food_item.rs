@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
-#[sea_orm(schema_name = "rust", table_name = "food_item")]
+#[sea_orm(table_name = "food_item")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,

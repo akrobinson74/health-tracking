@@ -7,7 +7,7 @@ rust-version = "1.91.0"
 publish = false
 
 [workspace]
-members = [".", "api", "entity"]
+members = [".", "api", "entity", "migration"]
 
 [dependencies]
 api = {path = "api"}

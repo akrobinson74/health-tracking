@@ -10,11 +10,15 @@ publish = false
 actix-web = "4.11.0"
 dotenvy = "0.15.7"
 listenfd = "1.0.2"
-entity = { path = "../entity" }
 chrono = "0.4.42"
 serde = { version = "1.0.228", features = ["derive"] }
 env_logger = "0.11.8"
 actix-cors = "0.7.1"
+entity = { path = "../entity" }
+async-lazy = "0.1.2"
+futures = "0.3.31"
+libtest-mimic = "0.8.1"
+inventory = "0.3.21"
 
 [dependencies.sea-orm]
 version = "~2.0.0-rc.18" # sea-orm version
@@ -24,3 +28,15 @@ features = [
     "sqlx-postgres",
     "sqlx-sqlite",
 ]
+
+[dev-dependencies]
+serial_test = "3.2.0"
+tokio = { version = "1.20.0", features = ["macros", "rt", "rt-multi-thread"] }
+api = { path = ".", features = ["sqlite"] }
+
+[features]
+sqlite = ["sea-orm/sqlx-sqlite"]
+
+#[[test]]
+#name = "integration"
+#harness = false

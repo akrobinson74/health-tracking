@@ -1,15 +1,17 @@
 pub mod service;
+pub mod data;
 
 use actix_web::middleware::Logger;
-use actix_web::{App, Error, HttpRequest, HttpResponse, HttpServer, get, post, web};
-use entity::food_item::ActiveModel;
+use actix_web::{get, post, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use env_logger::Env;
 use listenfd::ListenFd;
-use sea_orm::{Database, DatabaseConnection, InsertResult};
+use sea_orm::{Database, DatabaseConnection};
 use serde::Deserialize;
 use service::Repo;
 use std::env;
 use actix_cors::Cors;
+use entity::food_item;
+use self::data::food_item_input::FoodItemInput;
 
 const DEFAULT_ITEMS_PER_PAGE: u64 = 25;
 
@@ -25,17 +27,6 @@ pub struct Params {
     items_per_page: Option<u64>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct FoodItemInput {
-    pub date: Option<String>,
-    pub time: Option<String>,
-    pub name: String,
-    pub weight: f64,
-    pub calories: f64,
-    pub notes: Option<String>,
-    pub url: Option<String>,
-}
-
 #[post("/foodItem")]
 async fn create_food_item(
     data: web::Data<AppState>,
@@ -44,22 +35,20 @@ async fn create_food_item(
     let conn = &data.connection;
     let form = json.into_inner();
 
-    let insert_result: InsertResult<ActiveModel>;
+    let item: food_item::ActiveModel;
 
     if form.date.is_some() && form.time.is_some() {
-        insert_result = Repo::add_food_item(conn, form)
+        item = Repo::add_food_item(conn, form)
             .await
             .expect("could not add food_item");
     } else {
-        insert_result = Repo::add_food_item_now(conn, form)
+        item = Repo::add_food_item_now(conn, form)
             .await
             .expect("could not add food_item");
     }
 
-    let food_item_id = insert_result.last_insert_id;
-
     Ok(HttpResponse::Accepted()
-        .append_header(("location", format!("/foodItem/{}", food_item_id)))
+        .append_header(("location", format!("/foodItem/{}", item.id.unwrap())))
         .finish())
 }
 
