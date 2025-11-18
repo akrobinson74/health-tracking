@@ -16,9 +16,6 @@ env_logger = "0.11.8"
 actix-cors = "0.7.1"
 entity = { path = "../entity" }
 async-lazy = "0.1.2"
-futures = "0.3.31"
-libtest-mimic = "0.8.1"
-inventory = "0.3.21"
 
 [dependencies.sea-orm]
 version = "~2.0.0-rc.18" # sea-orm version
@@ -30,7 +27,9 @@ features = [
 ]
 
 [dev-dependencies]
-serial_test = "3.2.0"
+futures = "0.3.31"
+inventory = "0.3.21"
+libtest-mimic = "0.8.1"
 tokio = { version = "1.20.0", features = ["macros", "rt", "rt-multi-thread"] }
 api = { path = ".", features = ["sqlite"] }
 
