@@ -33,26 +33,30 @@ export type NestedFoodItem = {
 }
 
 export const nestFoodItems = (foodItems: FoodItem[]): NestedFoodItem[] => {
-  const nestedMap: { [key: string]: NestedFoodItem } = {};
+  let map = new Map<string, NestedFoodItem>();
 
   foodItems.forEach((item) => {
     const key = `${item.date}|${item.time}`;
-    if (!nestedMap[key]) {
-      nestedMap[key] = {
+
+    if (!map.has(key)) {
+      let nestedItem: NestedFoodItem = {
         id: item.id,
         date: item.date,
         time: item.time,
-        subRows: [],
+        subRows: [{ name: item.name, weight: item.weight, calories: item.calories, notes: item.notes, url: item.url }],
       };
+      map.set(key, nestedItem);
+    } else {
+      let nestedItem = map.get(key);
+      nestedItem?.subRows?.push({
+        name: item.name,
+        weight: item.weight,
+        calories: item.calories,
+        notes: item.notes,
+        url: item.url,
+      });
     }
-    nestedMap[key].subRows!.push({
-      name: item.name,
-      weight: item.weight,
-      calories: item.calories,
-      notes: item.notes,
-      url: item.url,
-    });
   });
 
-  return Object.values(nestedMap);
+  return Array.from(map.values());
 }
