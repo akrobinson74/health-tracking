@@ -1,4 +1,4 @@
-import { FoodItem } from "../models/FoodItem";
+import { FoodItem } from "../models/dataTypes";
 
 const getFoodItems = async (): Promise<FoodItem[]> => {
   try {

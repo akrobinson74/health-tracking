@@ -1,4 +1,4 @@
-import { FoodItem } from "../models/FoodItem";
+import { FoodItem } from "../models/dataTypes";
 
 const calculateTotalCalories = (items: FoodItem[]): string => {
   return items.reduce((total, item) => total + item.calories, 0).toFixed(2);

@@ -1,4 +1,4 @@
-import { FoodItem } from "../models/FoodItem";
+import { FoodItem } from "../models/dataTypes";
 
 export const testFoodItems: FoodItem[] = [
   {

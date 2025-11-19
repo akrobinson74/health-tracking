@@ -11,11 +11,11 @@ function App() {
             <li>
               <Link to="/foodItems">All Food Items</Link>
             </li>
-            <li>
-              <Link to="/foodItemsByDate/2024-11-12">
-                Food Items by Date (2024-11-12)
+            {/* <li>
+              <Link to="/foodItemsByDate/2025-11-12">
+                Food Items by Date (2025-11-12)
               </Link>
-            </li>
+            </li> */}
           </ul>
         </nav>
       </div>
